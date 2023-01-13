@@ -12,17 +12,17 @@ const MODE_INACTIVE = 2;
 /** 確認モード */
 const MODE_CHECK = 3;
 
-/** GAS のPOST処理 */
-function doPost(e)
-{
+/**
+ * GAS のPOST処理
+ * @param {any} e
+ */
+function doPost(e) {
   var modeValue = 0;
 
   // 強制チェックモード
-  if (isNull(e))
-  {
+  if (isNull(e)) {
     modeValue = MODE_CHECK;
-  } else
-  {
+  } else {
     var jsonData = JSON.parse(e.postData.getDataAsString());
     modeValue = jsonData.mode_type;
   }
@@ -35,15 +35,12 @@ function doPost(e)
   checkFile();
   RESULT_STATUS = !isNull(FILE_ID);
 
-  switch (modeValue)
-  {
+  switch (modeValue) {
     // アクティブ化
     case MODE_ACTIVE:
-      if (RESULT_STATUS)
-      {
+      if (RESULT_STATUS) {
         updateFile();
-      } else
-      {
+      } else {
         uploadFile();
       }
       RESULT_STATUS = true;
@@ -61,8 +58,7 @@ function doPost(e)
   }
 
   // 何もないので終わり
-  if (isNull(e))
-  {
+  if (isNull(e)) {
     return;
   }
 
@@ -83,63 +79,54 @@ function doPost(e)
 }
 
 /** データをアップロード */
-function uploadFile()
-{
-  try
-  {
+function uploadFile() {
+  try {
     var file = {
       title: ACTIVITY_FILE_NAME,
       mimeType: 'txt'
     };
     file = Drive.Files.insert(file, null);
-  } catch (err)
-  {
+  } catch (err) {
   }
 }
 
 /** データを更新する */
-function updateFile()
-{
-  try
-  {
+function updateFile() {
+  try {
     var file = {
       title: ACTIVITY_FILE_NAME,
       mimeType: 'txt'
     };
     // ファイルIDを指定して更新
     file = Drive.Files.update(file, FILE_ID);
-  } catch (err)
-  {
+  } catch (err) {
   }
 }
 
 /** データを削除 */
-function deleteFile()
-{
-  try
-  {
+function deleteFile() {
+  try {
     // ファイルIDを指定して削除
     Drive.Files.trash(FILE_ID);
-  } catch (err)
-  {
+  } catch (err) {
   }
 }
 
 /** ファイルの存在チェック */
-function checkFile()
-{
+function checkFile() {
   // 一致するファイルを検索＆またはゴミ箱に移動された親フォルダーからゴミ箱に移動されたかどうか
   var file = Drive.Files.list().items.find(v => v.title == ACTIVITY_FILE_NAME && v.labels.trashed == false);
-  if (isNull(file))
-  {
+  if (isNull(file)) {
     return;
   }
   FILE_ID = file.id;
   Logger.log(JSON.stringify(file));
 }
 
-/** null */
-function isNull(value)
-{
+/**
+ * null
+ * @param {any} value
+ */
+function isNull(value) {
   return value == null;
 }
